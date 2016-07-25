@@ -88,10 +88,6 @@
                 if (translate3dX < Width) {
                     infoDiv.innerHTML = "lalalala...";
                 }
-
-
-
-
                 var v = {
                     100: 6,
                     90: 7,
@@ -150,6 +146,10 @@
             sheep.addEventListener("mouseup", mouseupfun);
             sheep.addEventListener("mouseout", mouseoutfun);
             sheep.addEventListener("mousemove", mousemovefun);
+            sheep.addEventListener("touchstart", mousedownfun);
+            sheep.addEventListener("touchmove", mousemovefun);
+            sheep.addEventListener("touchend", mouseoutfun);
+
             loop(sheep, timev[parseInt(Math.random() * 13)], index);
         });
         var isMouseDown = false;
@@ -160,7 +160,7 @@
             e.preventDefault();
             isMouseDown = true;
             clearInterval(interValArr[this.getAttribute("data-index")]);
-            this.style.backgroundPositionY = "-117px";
+            this.style.backgroundPositionY = "-130px";
         };
 
         function mouseupfun(e) {
@@ -173,10 +173,10 @@
         }
 
         function mouseoutfun(e) {
-            //        console.log("down")
+
             isMouseDown = false;
             e.preventDefault();
-            //        isMouseIn=false;
+
             clearInterval(interValArr[this.getAttribute("data-index")]);
             loop(this, timev[parseInt(Math.random() * 13)], this.getAttribute("data-index"))
 
@@ -186,16 +186,24 @@
         }
 
         function mousemovefun(e) {
-            //        isMouseIn=true;
+
             console.log(isMouseDown)
             if (isMouseDown) {
                 e.preventDefault();
                 clearInterval(interValArr[this.getAttribute("data-index")]);
+                var disX,disY,clientX;
+                if(e.clientX){
+                    clientX=e.clientX;
+                    disX = parseInt(e.clientX) - parseInt(document.body.clientWidth),
+                            disY = parseInt(e.clientY) - parseInt(document.body.clientHeight);
+                }else{
+                    clientX=e.touches[0].clientX;
+                    disX = parseInt(e.touches[0].clientX) - parseInt(document.body.clientWidth),
+                            disY = parseInt(e.touches[0].clientX) - parseInt(document.body.clientHeight);
+                }
 
-                var disX = parseInt(e.clientX) - parseInt(document.body.clientWidth),
-                        disY = parseInt(e.clientY) - parseInt(document.body.clientHeight);
-                console.log(e.clientX + "--" + e.clientY + "==>" + document.body.clientWidth + "--" + document.body.clientHeight);
-                this.style.transform = "translate3d(" + (parseInt(e.clientX) - 70) + "px," + (disY + 50) + "px,0px)";
+//                console.log(e.clientX + "--" + e.clientY + "==>" + document.body.clientWidth + "--" + document.body.clientHeight);
+                this.style.transform = "translate3d(" + (parseInt(clientX) - 70) + "px," + (disY + 50) + "px,0px)";
             }
 
         }
