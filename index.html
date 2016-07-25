@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>sheep</title>
+    <style>
+        body {
+            background-color: #2691c9;
+        }
+
+        body,
+        html {
+            height: 100%;
+            padding: 0;
+            margin: 0;
+        }
+
+        div {
+            padding: 0;
+            margin: 0;
+        }
+
+        #main {
+            position: fixed;
+            width: 100%;
+            /*overflow: hidden;*/
+            height: 117px;
+            bottom: 0;
+            font-size: 0;
+        }
+
+        #info {
+            color: #fff;
+            font-size: 60px;
+            font-family: cursive;
+            text-align: center;
+            padding-top: 60px;
+        }
+
+        .sheepCon {
+
+            display: inline-block;
+        }
+
+        .sheep {
+            position: absolute;
+            width: 154px;
+            height: 117px;
+
+            background: url("sheep-ani.png") no-repeat;
+            
+        }
+
+        .sheep {
+            cursor: url(hand-pick.cur), move;
+        }
+
+
+    </style>
+</head>
+
+<body>
+<div id="info">Wait...</div>
+<div id="main">
+</div>
+<script>
+    window.addEventListener("load", function() {
+        var mainDiv = document.getElementById("main");
+        var infoDiv = document.getElementById("info");
+        var SIZE = 20;
+        var str = ""
+        for (var i = 0; i < SIZE; i++) {
+            str += "<div class='sheepCon'><div class='sheep' data-index=" + i + " style='background-position: 0px 0px;transform:translate3d(0px,0px,0px)'></div></div>";
+        }
+        mainDiv.innerHTML = str;
+        var Width = document.body.clientWidth;
+        var interValArr = []
+
+        function loop(sheep, time, index) {
+            var interval = setInterval(function() {
+                var transformall = sheep.style.transform,
+                        translate3dX = parseInt(transformall.substr(transformall.indexOf('(') + 1)),
+                        translate3dY = parseInt(transformall.substr(transformall.indexOf(',') + 1));
+                var stylestr = "";
+                var lastpositionX = parseInt(sheep.style.backgroundPositionX);
+                Width = document.body.clientWidth;
+                if (translate3dX < Width) {
+                    infoDiv.innerHTML = "lalalala...";
+                }
+
+
+
+
+                var v = {
+                    100: 6,
+                    90: 7,
+                    80: 8,
+                    70: 9,
+                    60: 10,
+                    50: 11,
+                    110: 5,
+                    120: 4,
+                    130: 3,
+                    140: 2
+
+                };
+                if (lastpositionX <= -1148) {
+
+                    stylestr = "background-position: 0px 0px;"
+                } else {
+
+                    stylestr = "background-position: " + (lastpositionX - 164) + "px 0px;"
+                }
+                if (translate3dX < -Width) {
+                    translate3dX = Width;
+                }
+                if (translate3dY != 0) {
+                    var downshow = setInterval(function() {
+                        if (translate3dY != 0) {
+                            translate3dY += 10;
+                            if (translate3dY > 0) {
+                                translate3dY = 0;
+                            }
+                            sheep.style.transform = "translate3d(" + (translate3dX) + "px," + (translate3dY) + "px,0px)";
+                        } else {
+                            clearInterval(downshow);
+                            stylestr += "transform:translate3d(" + (translate3dX - v[time]) + "px,0px,0px)";
+                            sheep.style = stylestr;
+                        }
+                    }, 5);
+                } else {
+                    stylestr += "transform:translate3d(" + (translate3dX - v[time]) + "px,0px,0px)";
+                    sheep.style = stylestr;
+                }
+
+            }, time);
+
+            interValArr[index] = interval;
+
+        }
+        var sheeps = document.getElementsByClassName("sheep");
+        sheeps = Array.prototype.slice.call(sheeps);
+        var timev = [100, 90, 80, 70, 60, 50, 110, 120, 130, 140, 90, 80, 100];
+
+        sheeps.forEach(function(sheep, index) {
+
+            sheep.style.transform = "translate3d(" + (index * 164 + Width) + "px,0px,0px)";
+            sheep.addEventListener("mousedown", mousedownfun);
+            sheep.addEventListener("mouseup", mouseupfun);
+            sheep.addEventListener("mouseout", mouseoutfun);
+            sheep.addEventListener("mousemove", mousemovefun);
+            loop(sheep, timev[parseInt(Math.random() * 13)], index);
+        });
+        var isMouseDown = false;
+        var isMouseIn = false;
+
+        function mousedownfun(e) {
+            console.log("down")
+            e.preventDefault();
+            isMouseDown = true;
+            clearInterval(interValArr[this.getAttribute("data-index")]);
+            this.style.backgroundPositionY = "-117px";
+        };
+
+        function mouseupfun(e) {
+            console.log("down")
+            e.preventDefault();
+            isMouseDown = false;
+            clearInterval(interValArr[this.getAttribute("data-index")]);
+            loop(this, timev[parseInt(Math.random() * 13)], this.getAttribute("data-index"))
+            this.style.backgroundPositionY = "0px";
+        }
+
+        function mouseoutfun(e) {
+            //        console.log("down")
+            isMouseDown = false;
+            e.preventDefault();
+            //        isMouseIn=false;
+            clearInterval(interValArr[this.getAttribute("data-index")]);
+            loop(this, timev[parseInt(Math.random() * 13)], this.getAttribute("data-index"))
+
+            this.style.backgroundPositionY = "0px";
+
+
+        }
+
+        function mousemovefun(e) {
+            //        isMouseIn=true;
+            console.log(isMouseDown)
+            if (isMouseDown) {
+                e.preventDefault();
+                clearInterval(interValArr[this.getAttribute("data-index")]);
+
+                var disX = parseInt(e.clientX) - parseInt(document.body.clientWidth),
+                        disY = parseInt(e.clientY) - parseInt(document.body.clientHeight);
+                console.log(e.clientX + "--" + e.clientY + "==>" + document.body.clientWidth + "--" + document.body.clientHeight);
+                this.style.transform = "translate3d(" + (parseInt(e.clientX) - 70) + "px," + (disY + 50) + "px,0px)";
+            }
+
+        }
+
+    })
+</script>
+</body>
+
+</html>
